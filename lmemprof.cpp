@@ -1,13 +1,12 @@
-#include <iostream>
 #include <map>
 #include <string>
 
 #include <lua.hpp>
 
-namespace gcprof {
+namespace memprof {
 lua_Alloc original_allocator = nullptr;
 
-class GCProf {
+class MemProf {
 public:
 	inline bool IsEnabled() const {
 		return enabled_;
@@ -64,7 +63,7 @@ private:
 	std::string_view current_zone_;
 };
 
-GCProf prof;
+MemProf prof;
 
 namespace lua {
 void* Hook(void* ud, void* ptr, size_t osize, size_t nsize) {
@@ -227,7 +226,7 @@ extern "C" {
 #endif // FOR_LUAJIT
 
 int Handle__tostring(lua_State* L) {
-	lua_pushstring(L, "GCProfHandle");
+	lua_pushstring(L, "lmemprof_handle");
 
 	return 1;
 }
@@ -236,67 +235,67 @@ int Handle__gc(lua_State* L) {
 	void* ud;
 
 	lua_getallocf(L, &ud);
-	lua_setallocf(L, gcprof::original_allocator, ud);
+	lua_setallocf(L, memprof::original_allocator, ud);
 
 	return 0;
 }
 
 } // namespace lua
-} // namespace gcprof
+} // namespace memprof
 
-extern "C" __declspec(dllexport) int luaopen_lgcprof(lua_State * L) noexcept {
+extern "C" __declspec(dllexport) int luaopen_lmemprof(lua_State * L) noexcept {
 	void* ud;
 
 	lua_Alloc allocator = lua_getallocf(L, &ud);
-	gcprof::original_allocator = allocator;
-	lua_setallocf(L, gcprof::lua::Hook, ud);
+	memprof::original_allocator = allocator;
+	lua_setallocf(L, memprof::lua::Hook, ud);
 
 	#ifdef FOR_LUA
 	lua_createtable(L, 0, 7);
-	lua_pushcfunction(L, gcprof::lua::GetZone);
+	lua_pushcfunction(L, memprof::lua::GetZone);
 	lua_setfield(L, -2, "GetZone");
 
-	lua_pushcfunction(L, gcprof::lua::IsEnabled);
+	lua_pushcfunction(L, memprof::lua::IsEnabled);
 	lua_setfield(L, -2, "IsEnabled");
 
-	lua_pushcfunction(L, gcprof::lua::Enable);
+	lua_pushcfunction(L, memprof::lua::Enable);
 	lua_setfield(L, -2, "Enable");
 
-	lua_pushcfunction(L, gcprof::lua::Disable);
+	lua_pushcfunction(L, memprof::lua::Disable);
 	lua_setfield(L, -2, "Disable");
 
-	lua_pushcfunction(L, gcprof::lua::SetZone);
+	lua_pushcfunction(L, memprof::lua::SetZone);
 	lua_setfield(L, -2, "SetZone");
 
-	lua_pushcfunction(L, gcprof::lua::ClearZone);
+	lua_pushcfunction(L, memprof::lua::ClearZone);
 	lua_setfield(L, -2, "ClearZone");
 
-	lua_pushcfunction(L, gcprof::lua::IncrementCounter);
+	lua_pushcfunction(L, memprof::lua::IncrementCounter);
 	lua_setfield(L, -2, "IncrementCounter");
 
-	lua_pushcfunction(L, gcprof::lua::DecrementCounter);
+	lua_pushcfunction(L, memprof::lua::DecrementCounter);
 	lua_setfield(L, -2, "DecrementCounter");
 
-	lua_pushcfunction(L, gcprof::lua::ResetCounter);
+	lua_pushcfunction(L, memprof::lua::ResetCounter);
 	lua_setfield(L, -2, "ResetCounter");
 
-	lua_pushcfunction(L, gcprof::lua::ResetCounterFor);
+	lua_pushcfunction(L, memprof::lua::ResetCounterFor);
 	lua_setfield(L, -2, "ResetCounterFor");
 
-	lua_pushcfunction(L, gcprof::lua::GetCounter);
+	lua_pushcfunction(L, memprof::lua::GetCounter);
 	lua_setfield(L, -2, "GetCounter");
 
-	lua_pushcfunction(L, gcprof::lua::GetCounterFor);
+	lua_pushcfunction(L, memprof::lua::GetCounterFor);
 	lua_setfield(L, -2, "GetCounterFor");
 	#endif // FOR_LUA
 
 	lua_newuserdata(L, 0);
 	lua_createtable(L, 0, 2);
 	
-	lua_pushcfunction(L, gcprof::lua::Handle__tostring);
+	lua_pushcfunction(L, memprof::lua::Handle__tostring);
 	lua_setfield(L, -2, "__tostring");
 
-	lua_pushcfunction(L, gcprof::lua::Handle__gc);
+	lua_pushcfunction(L, memprof::lua::Handle__gc);
 	lua_setfield(L, -2, "__gc");
 
 	lua_setmetatable(L, -2);
