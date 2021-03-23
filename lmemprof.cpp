@@ -250,7 +250,7 @@ extern "C" __declspec(dllexport) int luaopen_lmemprof(lua_State * L) noexcept {
 	memprof::original_allocator = allocator;
 	lua_setallocf(L, memprof::lua::Hook, ud);
 
-	#ifdef FOR_LUA
+#ifdef FOR_LUA
 	lua_createtable(L, 0, 7);
 	lua_pushcfunction(L, memprof::lua::GetZone);
 	lua_setfield(L, -2, "GetZone");
@@ -287,7 +287,7 @@ extern "C" __declspec(dllexport) int luaopen_lmemprof(lua_State * L) noexcept {
 
 	lua_pushcfunction(L, memprof::lua::GetCounterFor);
 	lua_setfield(L, -2, "GetCounterFor");
-	#endif // FOR_LUA
+#endif // FOR_LUA
 
 	lua_newuserdata(L, 0);
 	lua_createtable(L, 0, 2);
