@@ -1,4 +1,4 @@
-#include <map>
+#include <unordered_map>
 #include <string>
 
 #include <lua.hpp>
@@ -59,7 +59,7 @@ public:
 
 private:
 	bool enabled_ = false;
-	std::map<std::string_view, size_t> profiler_zones_;
+	std::unordered_map<std::string_view, size_t> profiler_zones_;
 	std::string_view current_zone_;
 };
 
