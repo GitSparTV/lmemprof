@@ -17,4 +17,20 @@ ffi.cdef([[
 	double GetCounterFor(const char* name);
 ]])
 
-return ffi.load("lmemprof.dll")
+local lib = ffi.load("lmemprof.dll")
+
+-- Getting all functions before using, this will remove unexpected allocations on profiling
+lib.IsEnabled()
+lib.GetZone()
+lib.Enable()
+lib.Disable()
+lib.SetZone("")
+lib.ClearZone()
+lib.IncrementCounter(0)
+lib.DecrementCounter(0)
+lib.ResetCounter()
+lib.ResetCounterFor("")
+lib.GetCounter()
+lib.GetCounterFor("")
+
+return lib
