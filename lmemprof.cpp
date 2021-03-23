@@ -49,12 +49,12 @@ public:
 		profiler_zones_[current_zone_] -= number;
 	}
 
-	inline void ResetCounter() noexcept {
-		profiler_zones_.emplace(current_zone_, 0);
-	}
-
 	inline void ResetCounter(std::string_view name) noexcept {
 		profiler_zones_.insert_or_assign(name, size_t{0});
+	}
+
+	inline void ResetCounter() noexcept {
+		ResetCounter(current_zone_);
 	}
 
 private:
